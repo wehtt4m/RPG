@@ -49,7 +49,7 @@ sonny.greet(jordan)
 
 
 sonny.num_unique_people_greeted()
-
+print(" ")
 # print(sonny.email, " ", sonny.phone)
 # print(jordan.email, " ", jordan.phone)
 
