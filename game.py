@@ -16,17 +16,25 @@ class Hero:
         print(f"You did {self.power} damage to the goblin.")
         if monster.health <= 0:
             print("The goblin is dead.")
-        print(f"The goblin has {monster.health} health left")
+        print(f"The goblin has {monster.health} health left.")
 
 class Goblin:
     def __init__(self, health, power):
         self.health = health
         self.power = power
+    def attack(self, human):
+        # Goblin attacks hero
+        human.health -= self.power
+        print(f"The goblin does {self.power} damage to you.")
+        if human.health <= 0:
+            print("You are dead.")
+        print(f"You have {human.health} health left.")
 
 heroErick = Hero(10, 5)
 goblinAnuj = Goblin(6, 2)
 
 heroErick.attack(goblinAnuj)
+goblinAnuj.attack(heroErick)
 
 
 # def main():
@@ -59,11 +67,11 @@ heroErick.attack(goblinAnuj)
 #         else:
 #             print("Invalid input {}".format(raw_input))
 
-#         if goblin_health > 0:
-#             # Goblin attacks hero
-#             hero_health -= goblin_power
-#             print("The goblin does {} damage to you.".format(goblin_power))
-#             if hero_health <= 0:
-#                 print("You are dead.")
+        # if goblin_health > 0:
+        #     # Goblin attacks hero
+        #     hero_health -= goblin_power
+        #     print("The goblin does {} damage to you.".format(goblin_power))
+        #     if hero_health <= 0:
+        #         print("You are dead.")
 
 # main()
