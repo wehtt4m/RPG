@@ -17,8 +17,8 @@ class Goblin:
         self.health = health
         self.power = power
 
-heroErick = Hero(100, 8)
-goblinAnuj = Goblin(44, 4)
+heroErick = Hero(10, 5)
+goblinAnuj = Goblin(6, 2)
 
 
 def main():
