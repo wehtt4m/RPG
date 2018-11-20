@@ -5,85 +5,126 @@
 # 1. fight goblin
 # 2. do nothing - in which case the goblin will attack him anyway
 # 3. flee
-
-class Hero:
+class Character:
     def __init__(self, health, power):
         self.health = health
         self.power = power
-    def attack(self, monster):
-            # Hero attacks goblin
-        monster.health-= self.power
-        print(f"You did {self.power} damage to the goblin.")
-        if monster.health <= 0:
-            print("The goblin is dead.")
-        print(f"The goblin has {monster.health} health left.")
+
     def alive(self):
         if self.health > 0:
-            print(f"You have {self.health} health left.")
+            return True
+        else:
+            return False
 
-class Goblin:
+class Hero(Character):
     def __init__(self, health, power):
-        self.health = health
-        self.power = power
+        super().__init__ (health, power)
+
+    def attack(self, monster):
+        monster.health-= self.power
+        print(f"You did {self.power} damage to the monster.")
+        if monster.health <= 0:
+            print("The monster is dead.")
+
+    def printStatus(self):
+        if self.alive() == True:
+            print(f"You have {self.health} health left.")    
+
+class Goblin(Character):
+    def __init__(self, health, power):
+        super().__init__(health, power)
+
     def attack(self, human):
-        # Goblin attacks hero
         human.health -= self.power
         print(f"The goblin does {self.power} damage to you.")
         if human.health <= 0:
             print("You are dead.")
-    def alive(self):
-        if self.health > 0:
+
+    def printStatus(self):
+        if self.alive() == True:
             print(f"The goblin has {self.health} health left.")
 
+class Zombie(Character):
+    def __init__(self, health, power):
+        super().__init__(health, power)
+    
+    def attack(self, human):
+        human.health -= self.power
+        print(f"The zombie does {self.power} damage to you.")
+        if human.health <= 0:
+            print("You are dead.")
 
+    def regen(self):
+        if self.health == 0:
+            self.health += 5
+            print("The zombie got it's health back and is alive!!!!")
             
+
+
+def main():
+
+    while goblinAnuj.health > 0 and heroErick.health > 0:
+        print()
+        print(f"You have {heroErick.health} health and {heroErick.power} power.")
+        print(f"The goblin has {goblinAnuj.health} health and {goblinAnuj.power} power.")
+        print()
+        print("What do you want to do?")
+        print("1. fight goblin")
+        print("2. do nothing")
+        print("3. flee")
+        print("> ", end=' ')
+        raw_input = input()
+        if raw_input == "1":
+            # Hero attacks goblin
+            heroErick.attack(goblinAnuj)
+
+        elif raw_input == "2":
+            pass
+        elif raw_input == "3":
+            print("Goodbye.")
+            break
+        else:
+            print("Invalid input {}".format(raw_input))
+
+        if goblinAnuj.health > 0:
+            # Goblin attacks hero
+            goblinAnuj.attack(heroErick)
+
+def zombieInt():
+
+    while zombiePhong.health > 0 and heroErick.health > 0:
+        print()
+        print(f"You have {heroErick.health} health and {heroErick.power} power.")
+        print(f"The goblin has {zombiePhong.health} health and {zombiePhong.power} power.")
+        print()
+        print("What do you want to do?")
+        print("1. fight zombie")
+        print("2. do nothing")
+        print("3. flee")
+        print("> ", end=' ')
+        raw_input = input()
+        if raw_input == "1":
+            # Hero attacks zombie
+            heroErick.attack(zombiePhong)
+            zombiePhong.regen()
+
+        elif raw_input == "2":
+            pass
+        elif raw_input == "3":
+            print("Goodbye.")
+            break
+        else:
+            print("Invalid input {}".format(raw_input))
+
+        if zombiePhong.health > 0:
+            # zombie attacks hero
+            zombiePhong.attack(heroErick)
+
 
 
 heroErick = Hero(10, 5)
 goblinAnuj = Goblin(6, 2)
+zombiePhong = Zombie(5,1)
 
-heroErick.attack(goblinAnuj)
-goblinAnuj.attack(heroErick)
-
-heroErick.alive()
-goblinAnuj.alive()
-
-
-# def main():
-#     hero_health = 10
-#     hero_power = 5
-#     goblin_health = 6
-#     goblin_power = 2
-
-#     while goblin_health > 0 and hero_health > 0:
-#         print("You have {} health and {} power.".format(hero_health, hero_power))
-#         print("The goblin has {} health and {} power.".format(goblin_health, goblin_power))
-#         print()
-#         print("What do you want to do?")
-#         print("1. fight goblin")
-#         print("2. do nothing")
-#         print("3. flee")
-#         print("> ", end=' ')
-#         raw_input = input()
-#         if raw_input == "1":
-#             # Hero attacks goblin
-#             goblin_health -= hero_power
-#             print("You do {} damage to the goblin.".format(hero_power))
-#             if goblin_health <= 0:
-#                 print("The goblin is dead.")
-#         elif raw_input == "2":
-#             pass
-#         elif raw_input == "3":
-#             print("Goodbye.")
-#             break
-#         else:
-#             print("Invalid input {}".format(raw_input))
-
-        # if goblin_health > 0:
-        #     # Goblin attacks hero
-        #     hero_health -= goblin_power
-        #     print("The goblin does {} damage to you.".format(goblin_power))
-        #     if hero_health <= 0:
-        #         print("You are dead.")
-
-# main()
+main()
+zombieInt()
