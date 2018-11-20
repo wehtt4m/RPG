@@ -6,9 +6,23 @@
 # 2. do nothing - in which case the goblin will attack him anyway
 # 3. flee
 class Character:
-    def __init__(self, health, power):
+    def __init__(self, noun, health, power):
+        self.noun = noun
         self.health = health
         self.power = power
+
+    def attack(self, monster):
+        monster.health -= self.power
+        print(f"You did {self.power} damage to {monster.noun}.")
+        print(f"{monster.noun} does {monster.power} damage to you.")
+        if monster.health <= 0:
+            print(f"{monster.noun} is dead.")
+        if self.health <= 0:
+            print("You are dead")
+            
+    def printStatus(self):
+        if self.alive() == True:
+            print(f"{self.noun} has {self.health} health left.") 
 
     def alive(self):
         if self.health > 0:
@@ -17,43 +31,17 @@ class Character:
             return False
 
 class Hero(Character):
-    def __init__(self, health, power):
-        super().__init__ (health, power)
-
-    def attack(self, monster):
-        monster.health-= self.power
-        print(f"You did {self.power} damage to the monster.")
-        if monster.health <= 0:
-            print("The monster is dead.")
-
-    def printStatus(self):
-        if self.alive() == True:
-            print(f"You have {self.health} health left.")    
+    def __init__(self, noun, health, power):
+        super().__init__ (noun, health, power)
 
 class Goblin(Character):
-    def __init__(self, health, power):
-        super().__init__(health, power)
-
-    def attack(self, human):
-        human.health -= self.power
-        print(f"The goblin does {self.power} damage to you.")
-        if human.health <= 0:
-            print("You are dead.")
-
-    def printStatus(self):
-        if self.alive() == True:
-            print(f"The goblin has {self.health} health left.")
+    def __init__(self, noun, health, power):
+        super().__init__(noun, health, power)
 
 class Zombie(Character):
-    def __init__(self, health, power):
-        super().__init__(health, power)
+    def __init__(self, noun, health, power):
+        super().__init__(noun, health, power)
     
-    def attack(self, human):
-        human.health -= self.power
-        print(f"The zombie does {self.power} damage to you.")
-        if human.health <= 0:
-            print("You are dead.")
-
     def regen(self):
         if self.health == 0:
             self.health += 5
@@ -86,16 +74,16 @@ def main():
         else:
             print("Invalid input {}".format(raw_input))
 
-        if goblinAnuj.health > 0:
-            # Goblin attacks hero
-            goblinAnuj.attack(heroErick)
+        # if goblinAnuj.health > 0:
+        #     # Goblin attacks hero
+        #     goblinAnuj.attack(heroErick)
 
 def zombieInt():
 
     while zombiePhong.health > 0 and heroErick.health > 0:
         print()
         print(f"You have {heroErick.health} health and {heroErick.power} power.")
-        print(f"The goblin has {zombiePhong.health} health and {zombiePhong.power} power.")
+        print(f"The zombie has {zombiePhong.health} health and {zombiePhong.power} power.")
         print()
         print("What do you want to do?")
         print("1. fight zombie")
@@ -116,15 +104,15 @@ def zombieInt():
         else:
             print("Invalid input {}".format(raw_input))
 
-        if zombiePhong.health > 0:
-            # zombie attacks hero
-            zombiePhong.attack(heroErick)
+        # if zombiePhong.health > 0:
+        #     # zombie attacks hero
+        #     zombiePhong.attack(heroErick)
 
 
 
-heroErick = Hero(10, 5)
-goblinAnuj = Goblin(6, 2)
-zombiePhong = Zombie(5,1)
+heroErick = Hero("The Hero", 10, 5)
+goblinAnuj = Goblin("The Goblin", 6, 2)
+zombiePhong = Zombie("The Zombie", 5,1)
 
 main()
 zombieInt()
