@@ -17,6 +17,9 @@ class Hero:
         if monster.health <= 0:
             print("The goblin is dead.")
         print(f"The goblin has {monster.health} health left.")
+    def alive(self):
+        if self.health > 0:
+            print(f"You have {self.health} health left.")
 
 class Goblin:
     def __init__(self, health, power):
@@ -28,13 +31,22 @@ class Goblin:
         print(f"The goblin does {self.power} damage to you.")
         if human.health <= 0:
             print("You are dead.")
-        print(f"You have {human.health} health left.")
+    def alive(self):
+        if self.health > 0:
+            print(f"The goblin has {self.health} health left.")
+
+
+            
+
 
 heroErick = Hero(10, 5)
 goblinAnuj = Goblin(6, 2)
 
 heroErick.attack(goblinAnuj)
 goblinAnuj.attack(heroErick)
+
+heroErick.alive()
+goblinAnuj.alive()
 
 
 # def main():
