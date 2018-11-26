@@ -28,8 +28,8 @@ class Player():
         self.down = False
 
     def draw(self, win):
-        global walkCount
-        win.blit(bg, (0,0))
+        #global walkCount
+        #win.blit(bg, (0,0))
 
         if self.walkCount + 1 >= 9:
             self.walkCount = 0
@@ -71,14 +71,9 @@ class Enemy():
         
 
     def draw(self, win):
-        self.move()
-        self.enemyUp()
-        self.enemyDown()
-        self.enemyLeft()
 
         if self.walkCount + 1 >= 6:
             self.walkCount = 0
-        
         if self.right == True:
             win.blit(self.walkRight[self.walkCount // 3], (self.x, self.y))
             self.walkCount += 1
@@ -93,32 +88,35 @@ class Enemy():
             self.walkCount +=1
 
         pass
-    
-    def move(self):
-        self.right = True
-        if self.x + self.vel < self.path[2]:
+    #----Rewrote this segment for enemy movement path.     ----
+    #----Enemy movement capped at self.path[#] based on    ----
+    #----constructor.                                      ----
+    #----Else statement helps changes the enemy direction  ----
+    #----                 mD 11-26-18                      ----
+    def enemyRight(self):
+        if self.x < self.path[2]:
             self.x += self.vel
-            goblin.draw(win)
         else:
             self.right = False
+            self.up = True
     def enemyUp(self):
-        self.up = True
-        if self.y - self.vel > self.path[3]:
+        if self.y > self.path[3]:
             self.y -= self.vel
         else:
             self.up = False
+            self.left = True
     def enemyLeft(self):
-        self.left = True
-        if self.x - self.vel > self.path[0]:
+        if self.x > self.path[0]:
             self.x -= self.vel
         else:
-            self.up = False
+            self.left = False
+            self.down = True
     def enemyDown(self):
-        self.down = True
-        if self.y + self.vel < self.path[1]:
+        if self.y < self.path[1]:
             self.y += self.vel
         else:
-            self.up = False
+            self.down = False
+            self.right = True
 
 
 
@@ -135,25 +133,37 @@ class Enemy():
             #     else: 
             #         self.vel = self.vel * -1
             #         self.walkCount = 0
-
+            
+#----win.blit:              background                     ----
+#----goblin.draw:           enemy image                    ----
+#----hero.draw:             hero image                     ----
+#----pygame.display.update: refreshes screen               ----
 def redrawGameWindow():
     win.blit(bg, (0,0))
+    goblin.draw(win)
     hero.draw(win)
     pygame.display.update()
+    
 
-
-hero = Player(300,410, 64,64)
+hero = Player(100,410, 64,64)
 goblin = Enemy(100,400,64,64,300,300)
+runMonster = True
 
-#mainloop
+
+
+    
+#----mainloop                                              ----
 run = True
+#----trigger point to start the monster path               ----
+#----set to false if you want to start with no monster     ----
+#----                mD 11-26-18                           ----
+goblin.right = True
 while run == True:
-    clock.tick(27)
-
+    clock.tick(25)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-    
+#----user input for hero movement                          ----
     keys = pygame.key.get_pressed()
 
     if keys[pygame.K_LEFT] and  hero.x > hero.vel:
@@ -177,7 +187,6 @@ while run == True:
         hero.down = False
         hero.up = True
 
-    
     elif keys[pygame.K_DOWN] and hero.y < 500 - hero.height - hero.vel:
         hero.y += hero.vel
         hero.right = False
@@ -191,35 +200,25 @@ while run == True:
         hero.up = False
         hero.down = False
         hero.walkCount = 0
-    
-    runMonster = True
-    while runMonster == True:
-        if goblin.right == True:
-            goblin.move()
-            goblin.draw(win)
-            pygame.display.update()
-
-        elif goblin.left == True:
-            goblin.enemyLeft()
-            goblin.draw(win)
-            pygame.display.update()
-
-        elif goblin.up ==  True:
-            goblin.enemyUp()
-            goblin.draw(win)
-            pygame.display.update()
-
-        elif goblin.down == True:
-            goblin.enemyDown()
-            goblin.draw(win)
-            pygame.display.update()
-
-        else:
-            goblin.down = False
-            goblin.up = False
-            goblin.left = False
-            goblin.right = False
-            runMonster = False
+    #----enemy movement                                    ----
+    #----shift enemy movement in hero while loop           ----
+    #----            mD 11-26-18                           ----
+    if goblin.right == True:
+        goblin.enemyRight()      
+    elif goblin.left == True:
+        goblin.enemyLeft()
+    elif goblin.up ==  True:
+        goblin.enemyUp()
+    elif goblin.down == True:
+        goblin.enemyDown()
+    else:
+        goblin.down = False
+        goblin.up = False
+        goblin.left = False
+        goblin.right = False
+        runMonster = False
+    #----telling program to update all the images          ----
+    redrawGameWindow()
 
     # if hero.isJump == False:
     #     # not used for platforms
@@ -244,7 +243,7 @@ while run == True:
     #         hero.isJump = False
     #         hero.jumpCount = 10    
 
-    redrawGameWindow()
+
 
 
 # runMonster = True
