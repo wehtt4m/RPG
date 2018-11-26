@@ -14,29 +14,25 @@ class Character:
         self.originalHealth = originalHealth
 
     def attack(self, monster):
-        damage = self.power
+
         damageAfter = monster.power - self.armor
         if self.noun == "The Hero":
-            critRoll = random.randint(1,5)
-            if critRoll == 5:
-                damage = 2 * self.power
-                print("Critical Hit!")
+            self.crit()
         elif self.noun == "The Medic":
-            if self.health < self.originalHealth:
-                print(f"After the attack you have {self.health} health")
-                if random.randint(1,5) == 5:
-                    self.health += 2
-                    print("You regenerated 2 health!")
+            self.regenHealth()
         elif self.noun == "The Shadow":
-            self.count(monster)
+            self.gamble(monster)
+        
 
         if self.noun != "The Shadow":
             if self.armor == 0:
                 self.health -= monster.power
             elif self.armor > 0:
                 self.health -= damageAfter
+        elif self.noun == "The Shadow":
+            self.health -= monster.power
             
-        monster.health -= damage
+        monster.health -= self.power
 
         if self.evasion == 2:
             if random.randint(1,10) == 1:
@@ -51,11 +47,17 @@ class Character:
                 monster.power = 0
                 damageAfter = 0
 
-        print(f"You did {damage} damage to {monster.noun}.")
+        print(f"You did {self.power} damage to {monster.noun}.")
+
+        if self.noun == "The Hero":
+            self.deCrit()
+
         if self.armor == 0:
             print(f"{monster.noun} does {monster.power} damage to you.")
         elif self.armor > 0:
             print(f"{monster.noun} does {damageAfter} damage to you because of your armor.")
+
+        
 
         if monster.health <= 0:
             monster.coinDrop(self)
@@ -73,6 +75,8 @@ class Character:
         else:
             return False
 
+    
+
 class GameInteraction():
     def shopInt(hero, store):
         print()
@@ -87,77 +91,25 @@ class GameInteraction():
         raw_input = input()
         if raw_input == "1":
             print("What would you like to buy?")
-            print(f"1. {store.item1.name}")
-            print(f"2 {store.item2.name}")
-            print(f"3. {store.item3.name}")
-            print(f"4. {store.item4.name}")
-            raw_input = input()
-            if raw_input == "1":
-                print(f"That will be {store.item1.cost} coins.")
-                print("Are you sure you want to buy this? (Y/N)")
-                raw_input = str.upper(input())
-                if raw_input == "Y":
-                    if hero.coinbag < store.item1.cost:
-                        print("Sorry you do not have enough money")
-                    if hero.coinbag >= store.item1.cost:
-                        hero.coinbag -= store.item1.cost
-                        print("Thank you for your purchase!")
-                        print(f"You have {hero.coinbag} coins left")
-                        hero.backpack.append(store.item1)
-                        for i in range(len(hero.backpack)):
-                            print(f"Your backpack: {hero.backpack[i].name}")
-                        GameInteraction.shopInt(hero,store)
-                elif raw_input == "N":
-                    GameInteraction.shopInt(hero,store)
+            x = 0
+            for i in store.inventory:
+                x += 1
+                print(f"{x}. {i.name}")
 
-            elif raw_input == "2":
-                print(f"That will be {store.item2.cost} coins.")
-                print("Are you sure you want to buy this? (Y/N)")
-                raw_input = str.upper(input())
-                if raw_input == "Y":
-                    if hero.coinbag < store.item2.cost:
-                        print("Sorry you do not have enough money")
-                    if hero.coinbag >= store.item2.cost:
-                        hero.coinbag -= store.item2.cost
+            raw_input = int(input())
+            for i in store.inventory:
+                if raw_input == i.number:
+                    print(f"That will be {i.cost} coins.")
+                    print("Are you sure you want to buy this? (Y/N)")
+                    raw_input = str.upper(input())
+                    if raw_input == "Y":
+                        if hero.coinbag < i.cost:
+                            print("Sorry you do not have enough money")
+                    if hero.coinbag >= i.cost:
+                        hero.coinbag -= i.cost
                         print("Thank you for your purchase!")
                         print(f"You have {hero.coinbag} coins left")
-                        hero.backpack.append(store.item2)
-                        for i in range(len(hero.backpack)):
-                            print(f"Your backpack: {hero.backpack[i].name}")                        
-                        GameInteraction.shopInt(hero,store)
-                elif raw_input == "N":
-                    GameInteraction.shopInt(hero,store)
-
-            elif raw_input == "3":
-                print(f"That will be {store.item3.cost} coins.")
-                print("Are you sure you want to buy this? (Y/N)")
-                raw_input = str.upper(input())
-                if raw_input == "Y":
-                    if hero.coinbag < store.item3.cost:
-                        print("Sorry you do not have enough money")
-                    if hero.coinbag >= store.item3.cost:
-                        hero.coinbag -= store.item3.cost
-                        print("Thank you for your purchase!")
-                        print(f"You have {hero.coinbag} coins left")
-                        hero.backpack.append(store.item3)
-                        for i in range(len(hero.backpack)):
-                            print(f"Your backpack: {hero.backpack[i].name}")
-                        GameInteraction.shopInt(hero,store)
-                elif raw_input == "N":
-                    GameInteraction.shopInt(hero,store)
-
-            elif raw_input == "4":
-                print(f"That will be {store.item4.cost} coins.")
-                print("Are you sure you want to buy this? (Y/N)")
-                raw_input = str.upper(input())
-                if raw_input == "Y":
-                    if hero.coinbag < store.item4.cost:
-                        print("Sorry you do not have enough money")
-                    if hero.coinbag >= store.item4.cost:
-                        hero.coinbag -= store.item4.cost
-                        print("Thank you for your purchase!")
-                        print(f"You have {hero.coinbag} coins left")
-                        hero.backpack.append(store.item4)
+                        hero.backpack.append(i)
                         for i in range(len(hero.backpack)):
                             print(f"Your backpack: {hero.backpack[i].name}")
                         GameInteraction.shopInt(hero,store)
@@ -198,33 +150,37 @@ class GameInteraction():
                 if len(myClass.backpack) > 0:
 
                     print("What item would you like to use?")
-                    
+
                     for i in range(len(myClass.backpack)):
                         order = int(order)
                         order += 1
                         order = str(order)
-                        print(order,".", f"{myClass.backpack[i].name}.")
+                        print(f"{order}",".", f"{myClass.backpack[i].name}.")
                         
                     order = 0
-                    raw_input = input()
+                    raw_input = (int(input()) - 1)
 
-                    if myClass.backpack[i].name == "Armor":
-                        myClass.backpack[i].buff(myClass)
-                        print(f"You have used {myClass.backpack[i].name}")
-                        myClass.backpack.remove(myClass.backpack[i])
-                    elif myClass.backpack[i].name == "Smoke Bomb":
-                        myClass.backpack[i].buff(myClass)
-                        print(f"You have used {myClass.backpack[i].name}")
+                    def useBackpack(myClass):
+                        myClass.backpack[raw_input].buff(myClass)
+                        print(f"You have used {myClass.backpack[raw_input].name}")
+                        myClass.backpack.remove(myClass.backpack[raw_input])
+
+                    if myClass.backpack[raw_input].name == "Leather Armor":
+                        useBackpack(myClass)
+                        print(f"Your armor is now {myClass.armor}")
+                    elif myClass.backpack[raw_input].name == "Smoke Bomb":
+                        useBackpack(myClass)
                         print(f"Your evasion is now {myClass.evasion}")
-                        myClass.backpack.remove(myClass.backpack[i])
-                    elif myClass.backpack[i].name == "Super Tonic":
+                    elif myClass.backpack[raw_input].name == "Super Tonic":
                         if myClass.noun == "The Shadow":
                             print("You cannot increase you health past 1.")
                         else:
-                            myClass.backpack[i].buff(myClass)
-                            print(f"You have used {myClass.backpack[i].name}")
+                            useBackpack(myClass)
                             print(f"You currently have {myClass.health} health")
-                            myClass.backpack.remove(myClass.backpack[i])
+                    elif myClass.backpack[raw_input].name == "Copper Sword":
+                        useBackpack(myClass)
+                        print(f"Your power is now {myClass.power}")
+                        
 
                 elif len(myClass.backpack) == 0:
                     print("Sorry you don't have any items")
@@ -240,12 +196,24 @@ class GameInteraction():
 # #===================Playable Characters===================
 
 class Hero(Character):
-    def __init__(self, noun, health, power, originalHealth, backpack, coinbag, armor, evasion):
+    def __init__(self, noun, health, power, originalHealth, backpack, coinbag, armor, evasion, originalPower):
         super().__init__ (noun, health, power, originalHealth)
         self.backpack = []
         self.coinbag = 0
         self.armor = 0
         self.evasion = 0
+        self.originalPower = 4
+    
+    def crit(self):
+        critRoll = random.randint(1,5)
+        if critRoll == 5:
+            self.power = 2 * self.power
+            print(f"Critical Hit!{self.power} damage done!")
+    
+    def deCrit(self):
+        if self.originalPower < self.power:
+            self.power = int(self.power/2)
+
 
 class Medic(Character):
     def __init__(self, noun, health, power, originalHealth, backpack, coinbag, armor, evasion):
@@ -254,6 +222,13 @@ class Medic(Character):
         self.coinbag = 0
         self.armor = 0
         self.evasion = 0
+
+    def regenHealth(self):
+        if self.health < self.originalHealth:
+            print(f"After the attack you have {self.health} health")
+            if random.randint(1,5) == 5:
+                self.health += 2
+                print("You regenerated 2 health!")
 
 class Shadow(Character):
     def __init__(self, noun, health, power, originalHealth, attackCount, backpack, coinbag, armor,evasion):
@@ -266,8 +241,9 @@ class Shadow(Character):
         self.armor = 0
         self.evasion = 0
 
-    def count(self, monster):
-        if random.randint(1,10) < 10:
+    def gamble(monster):
+        hitRoll = random.randint(1,10)
+        if hitRoll < 2:
             monster.power = 0
     
     def notOne(self):
@@ -322,7 +298,7 @@ class Zombie(Character):
 class Dwarf(Character):
     def __init__(self, noun, health, power, originalHealth, bounty):
         super().__init__(noun, health, power, originalHealth)
-        self.bounty = 7
+        self.bounty = 20
 
     def itemDrop(self):
         if self.health <= 0:
@@ -341,7 +317,8 @@ class Tonic():
     def __init__(self, name, cost, value):
         self.name = "Super Tonic"
         self.cost = 2
-        self.value = 1 
+        self.value = 1
+        self.number = 1
 
     def buff(self, hero):
         hero.health += 10
@@ -352,6 +329,7 @@ class Armor():
         self.name = "Leather Armor"
         self.cost = 5
         self.value = 3
+        self.number = 2
     
     def buff(self,myClass):
         myClass.armor += 1
@@ -361,15 +339,17 @@ class Weapon():
         self.name = "Copper Sword"
         self.cost = 5
         self.value = 3
+        self.number = 3
 
     def buff(self, hero):
-        hero.power + 2
+        hero.power += 2
 
 class Bomb():
     def __init__(self, name, cost, value):
         self.name = "Smoke Bomb"
         self.cost = 4
         self.value = 2
+        self.number = 4
     
     def buff(self,myClass):
         myClass.evasion += 1
@@ -381,20 +361,19 @@ class Store():
         self.item2 = item2
         self.item3 = item3
         self.item4 = item4
+        self.inventory = [self.item1, self.item2, self.item3, self.item4]
 
-    def inventory(self):
-        items = [self.item1, self.item2, self.item3, self.item4]
 
 
 
 knightMatt = Knight("The Knight", 25, 4, 25, None, None, None, None)
-heroErick = Hero("The Hero", 10, 3, 10, None, None, None, None)
+heroErick = Hero("The Hero", 25, 4, 10, None, None, None, None, None)
 medicRay = Medic("The Medic", 15, 2, 15, None, None, None, None)
 shadowBen = Shadow("The Shadow", None , 3, None, 10, None, None, None, None)
 
 dwarfEric = Dwarf("The Dwarf", 20, 3, 20, None)
 goblinAnuj = Goblin("The Goblin", 13, 2, 6, None)
-zombiePhong = Zombie("The Zombie", 5,1, 5, None)
+zombiePhong = Zombie("The Zombie", 5,0, 5, None)
 
 healTonic = Tonic(None, None, None)
 beginArmor = Armor(None, None, None)
@@ -407,9 +386,10 @@ beginStore = Store(healTonic, beginArmor, beginWeap, beginBomb)
 # print(knightMatt.coinbag)
 # GameInteraction.shopInt(medicRay,beginStore)
 
-GameInteraction.monsterInt(shadowBen, dwarfEric)
-GameInteraction.shopInt(shadowBen, beginStore)
-GameInteraction.monsterInt(shadowBen, goblinAnuj)
+GameInteraction.monsterInt(heroErick, dwarfEric)
+
+GameInteraction.shopInt(heroErick, beginStore)
+GameInteraction.monsterInt(heroErick, goblinAnuj)
 
 
 
